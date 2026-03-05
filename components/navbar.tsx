@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useBasket } from "@/lib/basket-context";
 import { Badge } from "@/components/ui/badge";
+import { AuthStatus } from "@/components/auth-status";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -41,6 +42,7 @@ export function Navbar() {
             </Link>
           ))}
         </nav>
+        <AuthStatus />
       </div>
     </header>
   );
