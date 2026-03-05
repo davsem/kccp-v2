@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Khalsa Community Pitch Project (KCCP)
+
+A fundraiser web app where supporters can sponsor 1m² sections of an artificial hockey pitch for **Khalsa Hockey Club**.
+
+## Overview
+
+The pitch is divided into a 20×10 grid of 200 sections. Supporters browse the interactive pitch, select sections to sponsor, and review their basket before completing a pledge. Centre sections are priced at **£100** and surrounding sections at **£50**.
+
+## Routes
+
+| Route | Description |
+|---|---|
+| `/` | Homepage — hero section with CTA |
+| `/pitch` | Interactive pitch grid — browse and select sections |
+| `/basket` | Review selected sections, total cost, and clear basket |
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router, Turbopack)
+- **Language**: TypeScript 5 (strict mode)
+- **Styling**: Tailwind CSS v4 via PostCSS
+- **UI Components**: ShadCN UI
+- **Fonts**: Geist Sans & Geist Mono
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev    # Development server (Turbopack)
+npm run build  # Production build
+npm run start  # Production server
+npm run lint   # ESLint
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/                   # Next.js App Router pages
+  page.tsx             # Homepage
+  pitch/page.tsx       # Pitch grid page
+  basket/page.tsx      # Basket page
+components/
+  ui/                  # ShadCN UI primitives
+  navbar.tsx           # Top nav with basket count badge
+  footer.tsx           # Site footer
+  pitch-grid.tsx       # 20×10 CSS grid with running total
+  pitch-section-cell.tsx  # Individual grid cell
+  basket-content.tsx   # Basket item list and total
+lib/
+  types.ts             # PitchSection interface
+  pitch-data.ts        # 200-section grid data
+  basket-context.tsx   # BasketProvider + useBasket hook
+  utils.ts             # cn() utility (clsx + tailwind-merge)
+```
