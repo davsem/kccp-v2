@@ -1,55 +1,27 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center p-8 bg-background">
-      <div className="w-full max-w-2xl space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">ShadCN UI Demo</h1>
-          <p className="text-muted-foreground">Example components installed and ready to use.</p>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Buttons</CardTitle>
-            <CardDescription>All button variants.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            <Button>Default</Button>
-            <Button variant="secondary">Secondary</Button>
-            <Button variant="destructive">Destructive</Button>
-            <Button variant="outline">Outline</Button>
-            <Button variant="ghost">Ghost</Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Badges</CardTitle>
-            <CardDescription>Status and label indicators.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            <Badge>Default</Badge>
-            <Badge variant="secondary">Secondary</Badge>
-            <Badge variant="destructive">Destructive</Badge>
-            <Badge variant="outline">Outline</Badge>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Input</CardTitle>
-            <CardDescription>Text input field.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <label className="text-sm font-medium">Email address</label>
-            <Input type="email" placeholder="you@example.com" />
-          </CardContent>
-        </Card>
+    <div className="mx-auto max-w-3xl px-4 py-24 text-center space-y-8">
+      <div className="space-y-4">
+        <h1 className="text-5xl font-bold tracking-tight">
+          Khalsa Community Pitch Project
+        </h1>
+        <p className="text-xl text-muted-foreground">
+          Help Khalsa Hockey Club build a world-class artificial pitch.
+        </p>
       </div>
-    </main>
-  )
+
+      <p className="text-muted-foreground leading-relaxed max-w-xl mx-auto">
+        We&apos;re raising funds by selling individual 1m² sections of our new
+        artificial hockey pitch. Sponsor a section — or several — and your name
+        will be part of our club&apos;s history. Every square matters.
+      </p>
+
+      <Button asChild size="lg">
+        <Link href="/pitch">Browse The Pitch</Link>
+      </Button>
+    </div>
+  );
 }
