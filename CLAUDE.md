@@ -33,8 +33,12 @@ This is a **Next.js 16.1.6** project using the **App Router** (`app/` directory)
 | Route | File | Notes |
 |---|---|---|
 | `/` | `app/page.tsx` | Homepage — hero + CTA to `/pitch` |
-| `/pitch` | `app/pitch/page.tsx` | Interactive 20×10 pitch grid |
-| `/basket` | `app/basket/page.tsx` | Selected sections list + total — **protected** |
+| `/pitch` | `app/pitch/page.tsx` | Interactive 20×10 pitch grid; fetches `purchased_sections` server-side |
+| `/basket` | `app/basket/page.tsx` | Selected sections list + "Proceed to Checkout" CTA |
+| `/checkout` | `app/checkout/page.tsx` | 3-step checkout — **protected** (redirects to sign-in or complete-profile) |
+| `/checkout/confirmation` | `app/checkout/confirmation/page.tsx` | Post-payment confirmation; reads `payment_intent` from URL |
+| `/api/checkout/create-payment-intent` | `app/api/checkout/create-payment-intent/route.ts` | POST — creates Stripe PaymentIntent + pending order |
+| `/api/webhooks/stripe` | `app/api/webhooks/stripe/route.ts` | POST — Stripe webhook; fulfils or refunds orders |
 | `/auth/sign-in` | `app/auth/sign-in/page.tsx` | Email+password + Google OAuth sign-in |
 | `/auth/sign-up` | `app/auth/sign-up/page.tsx` | Email+password + Google OAuth sign-up |
 | `/auth/callback` | `app/auth/callback/route.ts` | PKCE OAuth callback — exchanges code for session |
@@ -46,20 +50,29 @@ This is a **Next.js 16.1.6** project using the **App Router** (`app/` directory)
 
 | File | Purpose |
 |---|---|
-| `lib/types.ts` | `PitchSection` and `Profile` interfaces |
+| `lib/types.ts` | All interfaces: `PitchSection`, `Profile`, `BillingAddress`, `SectionOwnerConfig`, `Order`, `OrderItem`, `PurchasedSection` |
 | `lib/pitch-data.ts` | 200-section grid (20×10); centre sections £100, others £50 |
-| `lib/basket-context.tsx` | `BasketProvider` + `useBasket` hook (Set-based, client-only) |
+| `lib/basket-context.tsx` | `BasketProvider` + `useBasket` hook (Set-based, client-only); includes `removeMultiple()` |
+| `lib/stripe/server.ts` | Stripe Node.js client singleton (server-only) |
+| `lib/stripe/client.ts` | `loadStripe()` promise for client-side Stripe Elements |
 | `lib/supabase/client.ts` | Browser Supabase client (`createBrowserClient`) |
 | `lib/supabase/server.ts` | Server Supabase client (`createServerClient` with async cookies) |
+| `lib/supabase/admin.ts` | service_role Supabase client — only used in webhook, bypasses RLS |
 | `lib/supabase/middleware.ts` | `updateSession()` — 3-phase: refresh → route protection → profile check |
 | `lib/supabase/database.types.ts` | Generated TypeScript types for the Supabase schema |
 | `middleware.ts` | Next.js middleware entry — calls `updateSession()` |
 | `components/navbar.tsx` | Top nav with active-link highlight, basket count badge, and `<AuthStatus />` |
 | `components/auth-status.tsx` | Client component — shows "Sign in" or email + "Sign out" |
 | `components/footer.tsx` | Minimal footer with Separator |
-| `components/pitch-grid.tsx` | CSS Grid layout, running count + total, "View Basket" CTA |
-| `components/pitch-section-cell.tsx` | Single grid cell — green/amber/muted states |
-| `components/basket-content.tsx` | Basket item list, total, clear, empty state |
+| `components/pitch-grid.tsx` | CSS Grid layout, running count + total, marks sold sections slate |
+| `components/pitch-section-cell.tsx` | Single grid cell — green / amber / sold (slate) states |
+| `components/basket-content.tsx` | Basket list, stale-section detection, "Proceed to Checkout" CTA |
+| `components/checkout-content.tsx` | Client orchestrator for 3-step checkout flow |
+| `components/checkout/section-owner-names.tsx` | Step 1: per-section owner name + show/hide toggle |
+| `components/checkout/billing-payment.tsx` | Step 2: billing address form + GiftAid declaration |
+| `components/checkout/order-review.tsx` | Step 3: order summary + Stripe Elements wrapper |
+| `components/checkout/payment-form.tsx` | Stripe `PaymentElement` + `confirmPayment` handler |
+| `components/checkout/clear-basket-on-success.tsx` | Client component — clears basket on confirmation page load |
 
 ## Key Conventions
 
@@ -96,4 +109,22 @@ This is a **Next.js 16.1.6** project using the **App Router** (`app/` directory)
 - **Profile requirement**: users must complete a profile (`profiles` table) before accessing protected routes — no auto-creation trigger, manual form at `/auth/complete-profile`
 - **Credentials**: stored in `.env.local` — `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - **Google OAuth**: requires manual configuration in Supabase Dashboard → Authentication → Providers → Google; redirect URI is `https://fazbttucywkxnjesktri.supabase.co/auth/v1/callback`
-- **No checkout/payment flow yet**
+
+## Payments (Stripe)
+
+- **Packages**: `stripe` (server), `@stripe/stripe-js` + `@stripe/react-stripe-js` (client)
+- **Flow**: basket → `POST /api/checkout/create-payment-intent` → Stripe Elements → webhook fulfils order
+- **Env vars**: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`
+- **Webhook**: verify signature with `stripe.webhooks.constructEvent`; use `supabaseAdmin` (service_role) to bypass RLS when writing `purchased_sections`
+- **Race condition**: two users paying for the same section → `purchased_sections` PK constraint ensures only the first webhook insert succeeds; the loser is automatically refunded via `stripe.refunds.create`
+- **Local webhook testing**: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+- **Stripe API version**: `2026-02-25.clover`
+
+## Database Tables
+
+| Table | RLS | Notes |
+|---|---|---|
+| `profiles` | users read/write own row | Required before checkout |
+| `orders` | users SELECT/INSERT own rows | One per checkout; status: pending → completed/failed |
+| `order_items` | users SELECT/INSERT via order ownership | One per section |
+| `purchased_sections` | anyone SELECT; service_role INSERT only | Source of truth for sold sections |

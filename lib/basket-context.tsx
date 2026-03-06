@@ -13,6 +13,7 @@ interface BasketContextValue {
   count: number;
   add: (id: string) => void;
   remove: (id: string) => void;
+  removeMultiple: (ids: string[]) => void;
   toggle: (id: string) => void;
   clear: () => void;
   isSelected: (id: string) => boolean;
@@ -47,6 +48,14 @@ export function BasketProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const removeMultiple = useCallback((ids: string[]) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.delete(id));
+      return next;
+    });
+  }, []);
+
   const clear = useCallback(() => {
     setSelectedIds(new Set());
   }, []);
@@ -57,8 +66,8 @@ export function BasketProvider({ children }: { children: React.ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ selectedIds, count: selectedIds.size, add, remove, toggle, clear, isSelected }),
-    [selectedIds, add, remove, toggle, clear, isSelected]
+    () => ({ selectedIds, count: selectedIds.size, add, remove, removeMultiple, toggle, clear, isSelected }),
+    [selectedIds, add, remove, removeMultiple, toggle, clear, isSelected]
   );
 
   return (

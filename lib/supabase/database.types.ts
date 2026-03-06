@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      order_items: {
+        Row: {
+          id: string
+          order_id: string
+          owner_name: string | null
+          price: number
+          section_id: string
+          show_owner_name: boolean
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          owner_name?: string | null
+          price: number
+          section_id: string
+          show_owner_name?: boolean
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          owner_name?: string | null
+          price?: number
+          section_id?: string
+          show_owner_name?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount_total: number
+          billing_address_line1: string | null
+          billing_address_line2: string | null
+          billing_city: string | null
+          billing_country: string | null
+          billing_name: string | null
+          billing_postal_code: string | null
+          created_at: string
+          currency: string
+          gift_aid: boolean
+          id: string
+          status: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_total: number
+          billing_address_line1?: string | null
+          billing_address_line2?: string | null
+          billing_city?: string | null
+          billing_country?: string | null
+          billing_name?: string | null
+          billing_postal_code?: string | null
+          created_at?: string
+          currency?: string
+          gift_aid?: boolean
+          id?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_total?: number
+          billing_address_line1?: string | null
+          billing_address_line2?: string | null
+          billing_city?: string | null
+          billing_country?: string | null
+          billing_name?: string | null
+          billing_postal_code?: string | null
+          created_at?: string
+          currency?: string
+          gift_aid?: boolean
+          id?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -41,6 +130,41 @@ export type Database = {
         }
         Relationships: []
       }
+      purchased_sections: {
+        Row: {
+          order_id: string
+          owner_name: string | null
+          purchased_at: string
+          section_id: string
+          show_owner_name: boolean
+          user_id: string
+        }
+        Insert: {
+          order_id: string
+          owner_name?: string | null
+          purchased_at?: string
+          section_id: string
+          show_owner_name?: boolean
+          user_id: string
+        }
+        Update: {
+          order_id?: string
+          owner_name?: string | null
+          purchased_at?: string
+          section_id?: string
+          show_owner_name?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchased_sections_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -49,7 +173,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      order_status: "pending" | "completed" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -176,6 +300,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      order_status: ["pending", "completed", "failed"],
+    },
   },
 } as const

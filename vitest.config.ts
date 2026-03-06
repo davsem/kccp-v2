@@ -11,6 +11,7 @@ export default defineConfig({
     coverage: {
       exclude: ["components/ui/**", "lib/supabase/database.types.ts"],
     },
+    reporters: ["tree"],
   },
   resolve: {
     alias: {

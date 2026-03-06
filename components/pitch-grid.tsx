@@ -6,9 +6,18 @@ import { pitchSections, GRID_COLS } from "@/lib/pitch-data";
 import { getSectionById } from "@/lib/pitch-data";
 import { PitchSectionCell } from "@/components/pitch-section-cell";
 import { Button } from "@/components/ui/button";
+import type { PurchasedSection } from "@/lib/types";
 
-export function PitchGrid() {
+interface PitchGridProps {
+  purchasedSections?: PurchasedSection[];
+}
+
+export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
   const { selectedIds, count } = useBasket();
+
+  const purchasedMap = new Map(
+    purchasedSections.map((ps) => [ps.section_id, ps])
+  );
 
   const total = Array.from(selectedIds).reduce((sum, id) => {
     const section = getSectionById(id);
@@ -23,7 +32,11 @@ export function PitchGrid() {
           style={{ gridTemplateColumns: `repeat(${GRID_COLS}, minmax(2rem, 1fr))`, minWidth: "40rem" }}
         >
           {pitchSections.map((section) => (
-            <PitchSectionCell key={section.id} section={section} />
+            <PitchSectionCell
+              key={section.id}
+              section={section}
+              purchased={purchasedMap.get(section.id)}
+            />
           ))}
         </div>
       </div>

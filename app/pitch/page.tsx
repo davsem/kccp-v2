@@ -1,10 +1,19 @@
+import { createClient } from "@/lib/supabase/server";
 import { PitchGrid } from "@/components/pitch-grid";
+import type { PurchasedSection } from "@/lib/types";
 
 export const metadata = {
   title: "The Pitch — Khalsa Community Pitch Project",
 };
 
-export default function PitchPage() {
+export default async function PitchPage() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("purchased_sections")
+    .select("section_id, owner_name, show_owner_name");
+
+  const purchasedSections: PurchasedSection[] = (data ?? []) as PurchasedSection[];
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-6">
       <div>
@@ -14,7 +23,7 @@ export default function PitchPage() {
           £100; all others are £50.
         </p>
       </div>
-      <PitchGrid />
+      <PitchGrid purchasedSections={purchasedSections} />
     </div>
   );
 }
