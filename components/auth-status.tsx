@@ -4,6 +4,13 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import type { User } from "@supabase/supabase-js"
 
 export function AuthStatus() {
@@ -39,16 +46,23 @@ export function AuthStatus() {
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <span className="text-sm text-muted-foreground">{user.email}</span>
-      <form action="/auth/sign-out" method="POST">
-        <button
-          type="submit"
-          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Sign out
-        </button>
-      </form>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger className="text-sm text-muted-foreground transition-colors hover:text-foreground outline-none">
+        {user.email}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem asChild>
+          <Link href="/profile">Profile</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <form action="/auth/sign-out" method="POST">
+            <button type="submit" className="w-full text-left">
+              Sign out
+            </button>
+          </form>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

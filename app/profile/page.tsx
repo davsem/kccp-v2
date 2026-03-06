@@ -1,50 +1,51 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
 
-function CompleteProfileForm() {
+export default function ProfilePage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirectTo = searchParams.get("redirectTo") ?? "/"
 
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const supabase = createClient()
 
   useEffect(() => {
-    async function prefill() {
+    async function loadProfile() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
       setEmail(user.email ?? "")
-      // Pre-fill from Google user_metadata when available
-      const meta = user.user_metadata as Record<string, string> | undefined
-      if (meta?.full_name) {
-        const parts = meta.full_name.split(" ")
-        setFirstName(parts[0] ?? "")
-        setLastName(parts.slice(1).join(" "))
-      } else {
-        setFirstName(meta?.given_name ?? "")
-        setLastName(meta?.family_name ?? "")
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("id", user.id)
+        .single()
+
+      if (profile) {
+        setFirstName(profile.first_name ?? "")
+        setLastName(profile.last_name ?? "")
       }
     }
 
-    void prefill()
+    void loadProfile()
   }, [supabase])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setSuccess(false)
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
@@ -53,33 +54,43 @@ function CompleteProfileForm() {
       return
     }
 
-    const { error: insertError } = await supabase.from("profiles").insert({
-      id: user.id,
-      first_name: firstName,
-      last_name: lastName,
-      email,
-    })
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ first_name: firstName, last_name: lastName })
+      .eq("id", user.id)
 
-    if (insertError) {
-      setError(insertError.message)
+    if (updateError) {
+      setError(updateError.message)
       setLoading(false)
       return
     }
 
-    router.push(redirectTo)
+    setSuccess(true)
+    setLoading(false)
     router.refresh()
   }
 
   return (
     <div className="mx-auto max-w-sm px-4 py-16 space-y-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Complete your profile</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
         <p className="text-sm text-muted-foreground">
-          We need a few details before you continue.
+          Update your name details below.
         </p>
       </div>
 
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            readOnly
+            disabled
+            autoComplete="email"
+          />
+        </div>
         <div className="space-y-2">
           <Label htmlFor="firstName">First name</Label>
           <Input
@@ -104,33 +115,14 @@ function CompleteProfileForm() {
             autoComplete="family-name"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-          />
-        </div>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
+        {success && <p className="text-sm text-green-600">Profile updated.</p>}
 
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Saving…" : "Save and continue"}
+          {loading ? "Saving…" : "Save changes"}
         </Button>
       </form>
     </div>
-  )
-}
-
-export default function CompleteProfilePage() {
-  return (
-    <Suspense>
-      <CompleteProfileForm />
-    </Suspense>
   )
 }
