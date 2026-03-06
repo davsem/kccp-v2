@@ -108,7 +108,7 @@ describe("SignInPage", () => {
     await user.click(screen.getByRole("button", { name: /^Sign in$/i }))
 
     await waitFor(() => {
-      expect(screen.getByText("Invalid login credentials")).toBeInTheDocument()
+      expect(screen.getByText("Incorrect email or password.")).toBeInTheDocument()
     })
   })
 

@@ -55,4 +55,14 @@ describe("GET /auth/callback", () => {
 
     expect(response.headers.get("location")).toBe("http://localhost:3000/auth/auth-code-error")
   })
+
+  it("blocks open redirect attack via next param", async () => {
+    const mock = createMockSupabaseClient()
+    mockCreateClient.mockResolvedValue(mock)
+
+    const request = new Request("http://localhost:3000/auth/callback?code=abc123&next=https://evil.com")
+    const response = await GET(request)
+
+    expect(response.headers.get("location")).toBe("http://localhost:3000/")
+  })
 })

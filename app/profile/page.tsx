@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
+import { validateName, sanitizeAuthError } from "@/lib/utils"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -54,13 +55,21 @@ export default function ProfilePage() {
       return
     }
 
+    const validFirst = validateName(firstName)
+    const validLast = validateName(lastName)
+    if (!validFirst || !validLast) {
+      setError("First and last name must be between 1 and 100 characters.")
+      setLoading(false)
+      return
+    }
+
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({ first_name: firstName, last_name: lastName })
+      .update({ first_name: validFirst, last_name: validLast })
       .eq("id", user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(sanitizeAuthError(updateError.message))
       setLoading(false)
       return
     }

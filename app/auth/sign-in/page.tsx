@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
+import { safeRedirectPath, sanitizeAuthError } from "@/lib/utils"
 
 function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get("redirectTo") ?? "/"
+  const redirectTo = safeRedirectPath(searchParams.get("redirectTo") ?? "/")
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -28,7 +29,7 @@ function SignInForm() {
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
 
     if (signInError) {
-      setError(signInError.message)
+      setError(sanitizeAuthError(signInError.message))
       setLoading(false)
       return
     }
@@ -49,7 +50,7 @@ function SignInForm() {
     })
 
     if (oauthError) {
-      setError(oauthError.message)
+      setError(sanitizeAuthError(oauthError.message))
       setLoading(false)
     }
   }

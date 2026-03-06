@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
+import { safeRedirectPath, sanitizeAuthError } from "@/lib/utils"
 
 function SignUpForm() {
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get("redirectTo") ?? "/"
+  const redirectTo = safeRedirectPath(searchParams.get("redirectTo") ?? "/")
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -34,7 +35,7 @@ function SignUpForm() {
     })
 
     if (signUpError) {
-      setError(signUpError.message)
+      setError(sanitizeAuthError(signUpError.message))
       setLoading(false)
       return
     }
@@ -55,7 +56,7 @@ function SignUpForm() {
     })
 
     if (oauthError) {
-      setError(oauthError.message)
+      setError(sanitizeAuthError(oauthError.message))
       setLoading(false)
     }
   }

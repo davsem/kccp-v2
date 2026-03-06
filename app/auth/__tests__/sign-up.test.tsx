@@ -95,7 +95,7 @@ describe("SignUpPage", () => {
     await user.click(screen.getByRole("button", { name: /Create account/i }))
 
     await waitFor(() => {
-      expect(screen.getByText("Email already registered")).toBeInTheDocument()
+      expect(screen.getByText("Something went wrong. Please try again.")).toBeInTheDocument()
     })
   })
 

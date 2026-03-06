@@ -102,7 +102,7 @@ describe("CompleteProfilePage", () => {
     await userEvent_.click(screen.getByRole("button", { name: /Save and continue/i }))
 
     await waitFor(() => {
-      expect(screen.getByText("duplicate key")).toBeInTheDocument()
+      expect(screen.getByText("Something went wrong. Please try again.")).toBeInTheDocument()
     })
   })
 })

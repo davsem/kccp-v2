@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/client"
+import { safeRedirectPath, validateName, sanitizeAuthError } from "@/lib/utils"
 
 function CompleteProfileForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get("redirectTo") ?? "/"
+  const redirectTo = safeRedirectPath(searchParams.get("redirectTo") ?? "/")
 
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
@@ -53,15 +54,23 @@ function CompleteProfileForm() {
       return
     }
 
+    const validFirst = validateName(firstName)
+    const validLast = validateName(lastName)
+    if (!validFirst || !validLast) {
+      setError("First and last name must be between 1 and 100 characters.")
+      setLoading(false)
+      return
+    }
+
     const { error: insertError } = await supabase.from("profiles").insert({
       id: user.id,
-      first_name: firstName,
-      last_name: lastName,
+      first_name: validFirst,
+      last_name: validLast,
       email,
     })
 
     if (insertError) {
-      setError(insertError.message)
+      setError(sanitizeAuthError(insertError.message))
       setLoading(false)
       return
     }
