@@ -6,6 +6,7 @@ import { pitchSections, GRID_COLS } from "@/lib/pitch-data";
 import { getSectionById } from "@/lib/pitch-data";
 import { PitchSectionCell } from "@/components/pitch-section-cell";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import type { PurchasedSection } from "@/lib/types";
 
 interface PitchGridProps {
@@ -25,6 +26,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
   }, 0);
 
   return (
+    <TooltipProvider delayDuration={300}>
     <div className="space-y-4">
       <div className="overflow-x-auto">
         <div
@@ -50,5 +52,6 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
         </Button>
       </div>
     </div>
+    </TooltipProvider>
   );
 }
