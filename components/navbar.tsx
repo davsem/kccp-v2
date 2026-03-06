@@ -20,7 +20,7 @@ export function Navbar() {
   return (
     <header className="border-b bg-background">
       <div className="mx-auto flex max-w-6xl items-center justify-end px-4 py-3 gap-6">
-        <Link href="/" className="font-semibold tracking-tight text-foreground mr-auto">Khalsa Community Pitch</Link>
+        <Link href="/" className="font-semibold tracking-tight text-foreground mr-auto">Khalsa Community Pitch Project</Link>
         <nav className="flex items-center gap-6">
           {links.map(({ href, label }) => (
             <Link

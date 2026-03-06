@@ -5,10 +5,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev      # Start development server (Next.js with Turbopack)
-npm run build    # Production build
-npm run start    # Start production server
-npm run lint     # Run ESLint
+npm run dev           # Start development server (Next.js with Turbopack)
+npm run build         # Production build
+npm run start         # Start production server
+npm run lint          # Run ESLint
+npm run typecheck     # TypeScript type check (tsc --noEmit)
+npm test              # Run Vitest unit/component tests (vitest run)
+npm run test:watch    # Vitest in watch mode
+npm run test:coverage # Vitest with coverage report
+npm run test:e2e      # Cypress E2E (auto-starts dev server via start-server-and-test)
+npm run test:e2e:open # Cypress interactive mode (also auto-starts dev server)
 ```
 
 ## Architecture
@@ -65,14 +71,27 @@ This is a **Next.js 16.1.6** project using the **App Router** (`app/` directory)
 - Add new ShadCN components with `npx shadcn@latest add <component> -y`.
 - Use `import type` for type-only imports (`@typescript-eslint/consistent-type-imports` is enforced).
 - Use `"use client"` only where interactivity or hooks require it; server components are the default.
-- No testing framework is configured yet.
 - Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
+
+## Testing
+
+- **Unit/component**: Vitest 4 + `@testing-library/react` 16 + jsdom. Config in `vitest.config.ts`.
+- **E2E**: Cypress 15, config in `cypress.config.ts`, specs in `cypress/e2e/`. `start-server-and-test` auto-starts the dev server — no manual `npm run dev` needed.
+- **Setup file**: `tests/setup.ts` — imports jest-dom matchers, stubs `NEXT_PUBLIC_SUPABASE_*` env vars, auto-cleanup after each test.
+- **Mocks**:
+  - `tests/mocks/supabase.ts` — `createMockSupabaseClient(authConfig, dbConfig)` factory; exports `TEST_USER` and `TEST_PROFILE` fixtures.
+  - Supabase browser client (components): `vi.mock("@/lib/supabase/client", () => ({ createClient: () => mockSupabase }))`
+  - Supabase server client (route handlers): `vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn().mockResolvedValue(mockSupabase) }))`
+  - Supabase SSR (middleware): `vi.mock("@supabase/ssr", () => ({ createServerClient: vi.fn().mockReturnValue(mockSupabase) }))`
+  - Always import `vi` explicitly — `globals: true` only provides runtime access, not TS types.
+- **Test locations**: `lib/__tests__/`, `lib/supabase/__tests__/`, `components/__tests__/`, `app/auth/__tests__/`
+- **Protected routes** (actual, in `PROTECTED_ROUTES`): `/checkout`, `/profile` — **not** `/basket`.
 
 ## Auth
 
 - **Package**: `@supabase/ssr` (NOT the deprecated `auth-helpers`)
 - **Providers**: Email+Password and Google OAuth
-- **Protected routes**: `/basket`, `/checkout` (defined in `PROTECTED_ROUTES` array in `lib/supabase/middleware.ts`)
+- **Protected routes**: `/checkout`, `/profile` (defined in `PROTECTED_ROUTES` array in `lib/supabase/middleware.ts`)
 - **Auth decision**: always use `getUser()` (contacts auth server), never `getSession()` (unverified)
 - **Profile requirement**: users must complete a profile (`profiles` table) before accessing protected routes — no auto-creation trigger, manual form at `/auth/complete-profile`
 - **Credentials**: stored in `.env.local` — `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`

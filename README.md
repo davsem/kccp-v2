@@ -40,11 +40,33 @@ Copy `.env.local.example` to `.env.local` and add your Supabase credentials, the
 ## Commands
 
 ```bash
-npm run dev    # Development server (Turbopack)
-npm run build  # Production build
-npm run start  # Production server
-npm run lint   # ESLint
+npm run dev           # Development server (Turbopack)
+npm run build         # Production build
+npm run start         # Production server
+npm run lint          # ESLint
+npm run typecheck     # TypeScript type check
+npm test              # Unit & component tests (Vitest)
+npm run test:watch    # Vitest in watch mode
+npm run test:coverage # Vitest with coverage report
+npm run test:e2e      # Cypress E2E tests (auto-starts dev server)
+npm run test:e2e:open # Cypress interactive mode (auto-starts dev server)
 ```
+
+## Testing
+
+Unit and component tests use **Vitest** + **Testing Library** and run entirely in-process with a jsdom environment — no running server required.
+
+```bash
+npm test
+```
+
+End-to-end tests use **Cypress** and are driven against the real Next.js dev server, which is started automatically via `start-server-and-test`:
+
+```bash
+npm run test:e2e
+```
+
+Coverage includes unit tests for utilities and pitch data, hook tests for the basket context, middleware auth-phase tests, component tests for all UI components, page and route handler tests for all auth flows, and Cypress E2E tests for pitch selection, basket management, and auth redirects.
 
 ## Project Structure
 
