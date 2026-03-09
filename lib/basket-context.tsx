@@ -4,9 +4,38 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
+
+const COOKIE_NAME = "kccp-basket";
+const MAX_AGE_SECONDS = 86400;
+
+function getBasketCookie(): string[] {
+  try {
+    const match = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(`${COOKIE_NAME}=`));
+    if (!match) return [];
+    return JSON.parse(decodeURIComponent(match.split("=")[1])) as string[];
+  } catch {
+    return [];
+  }
+}
+
+const secure =
+  typeof window !== "undefined" && window.location.protocol === "https:"
+    ? "; Secure"
+    : "";
+
+function setBasketCookie(ids: string[]): void {
+  document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(ids))}; path=/; max-age=${MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
+}
+
+function clearBasketCookie(): void {
+  document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax${secure}`;
+}
 
 interface BasketContextValue {
   selectedIds: Set<string>;
@@ -23,6 +52,18 @@ const BasketContext = createContext<BasketContextValue | null>(null);
 
 export function BasketProvider({ children }: { children: React.ReactNode }) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Hydrate from cookie on mount (SSR-safe: initial state is empty to avoid mismatch)
+  useEffect(() => {
+    const ids = getBasketCookie();
+    if (ids.length > 0) setSelectedIds(new Set(ids));
+  }, []);
+
+  // Sync to cookie whenever selection changes (skip empty-set initial render is fine —
+  // writing an empty cookie on mount is harmless)
+  useEffect(() => {
+    setBasketCookie([...selectedIds]);
+  }, [selectedIds]);
 
   const add = useCallback((id: string) => {
     setSelectedIds((prev) => new Set(prev).add(id));
@@ -57,6 +98,7 @@ export function BasketProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const clear = useCallback(() => {
+    clearBasketCookie();
     setSelectedIds(new Set());
   }, []);
 

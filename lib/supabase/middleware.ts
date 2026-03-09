@@ -61,5 +61,6 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  response.headers.set("x-pathname", pathname)
   return response
 }

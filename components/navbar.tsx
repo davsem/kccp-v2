@@ -1,49 +1,33 @@
-"use client";
+import Link from "next/link"
+import { headers } from "next/headers"
+import { createClient } from "@/lib/supabase/server"
+import { NavLinks } from "@/components/nav-links"
+import { BasketBadge } from "@/components/basket-badge"
+import { AuthStatusServer } from "@/components/auth-status-server"
+import { AuthStateListener } from "@/components/auth-state-listener"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useBasket } from "@/lib/basket-context";
-import { Badge } from "@/components/ui/badge";
-import { AuthStatus } from "@/components/auth-status";
-import { cn } from "@/lib/utils";
+export async function Navbar() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/pitch", label: "The Pitch" },
-  { href: "/basket", label: "Basket" },
-];
-
-export function Navbar() {
-  const pathname = usePathname();
-  const { count } = useBasket();
+  const headersList = await headers()
+  const pathname = headersList.get("x-pathname") ?? "/"
 
   return (
     <header className="border-b bg-background">
       <div className="mx-auto flex max-w-6xl items-center justify-end px-4 py-3 gap-6">
-        <Link href="/" className="font-semibold tracking-tight text-foreground mr-auto">Khalsa Community Pitch Project</Link>
+        <Link href="/" className="font-semibold tracking-tight text-foreground mr-auto">
+          Khalsa Community Pitch Project
+        </Link>
         <nav className="flex items-center gap-6">
-          {links.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "text-sm transition-colors hover:text-foreground",
-                pathname === href
-                  ? "font-medium text-foreground"
-                  : "text-muted-foreground"
-              )}
-            >
-              {label}
-              {label === "Basket" && count > 0 && (
-                <Badge className="ml-1.5" variant="secondary">
-                  {count}
-                </Badge>
-              )}
-            </Link>
-          ))}
+          <NavLinks />
+          <BasketBadge />
         </nav>
-        <AuthStatus />
+        <AuthStatusServer user={user} pathname={pathname} />
+        <AuthStateListener />
       </div>
     </header>
-  );
+  )
 }

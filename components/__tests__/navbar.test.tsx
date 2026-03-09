@@ -1,8 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { Navbar } from "@/components/navbar"
-import { BasketProvider, useBasket } from "@/lib/basket-context"
-import { act, renderHook } from "@testing-library/react"
 import type { ReactNode } from "react"
 
 vi.mock("next/link", () => ({
@@ -11,61 +9,56 @@ vi.mock("next/link", () => ({
   ),
 }))
 
-vi.mock("@/components/auth-status", () => ({
-  AuthStatus: () => <div data-testid="auth-status" />,
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: vi.fn().mockResolvedValue({
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    },
+  }),
 }))
 
-vi.mock("next/navigation", () => ({
-  usePathname: vi.fn().mockReturnValue("/"),
+vi.mock("next/headers", () => ({
+  headers: vi.fn().mockResolvedValue(new Map([["x-pathname", "/"]])),
 }))
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <BasketProvider>{children}</BasketProvider>
-)
+vi.mock("@/components/nav-links", () => ({
+  NavLinks: () => <div data-testid="nav-links" />,
+}))
+
+vi.mock("@/components/basket-badge", () => ({
+  BasketBadge: () => <div data-testid="basket-badge" />,
+}))
+
+vi.mock("@/components/auth-status-server", () => ({
+  AuthStatusServer: () => <div data-testid="auth-status-server" />,
+}))
+
+vi.mock("@/components/auth-state-listener", () => ({
+  AuthStateListener: () => null,
+}))
 
 describe("Navbar", () => {
-  it("renders brand link", () => {
-    render(<Navbar />, { wrapper })
+  it("renders brand link", async () => {
+    const jsx = await Navbar()
+    render(jsx)
     expect(screen.getByText("Khalsa Community Pitch Project")).toBeInTheDocument()
   })
 
-  it("renders nav links", () => {
-    render(<Navbar />, { wrapper })
-    expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /The Pitch/ })).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /Basket/ })).toBeInTheDocument()
+  it("renders NavLinks", async () => {
+    const jsx = await Navbar()
+    render(jsx)
+    expect(screen.getByTestId("nav-links")).toBeInTheDocument()
   })
 
-  it("highlights active link based on pathname", () => {
-    render(<Navbar />, { wrapper })
-    const homeLink = screen.getByRole("link", { name: "Home" })
-    // pathname is "/" so Home should have active styles
-    expect(homeLink).toHaveClass("font-medium")
+  it("renders BasketBadge", async () => {
+    const jsx = await Navbar()
+    render(jsx)
+    expect(screen.getByTestId("basket-badge")).toBeInTheDocument()
   })
 
-  it("does not show basket badge when count is 0", () => {
-    render(<Navbar />, { wrapper })
-    expect(screen.queryByText(/^\d+$/)).not.toBeInTheDocument()
-  })
-
-  it("shows basket badge when items are in basket", async () => {
-    const sharedWrapper = ({ children }: { children: ReactNode }) => (
-      <BasketProvider>{children}</BasketProvider>
-    )
-
-    const { result } = renderHook(() => useBasket(), { wrapper: sharedWrapper })
-    act(() => result.current.add("0-0"))
-
-    // Re-render Navbar in same provider tree
-    const { rerender } = render(<Navbar />, { wrapper: sharedWrapper })
-    rerender(<Navbar />)
-
-    // Badge should now appear — use a fresh tree with pre-added item
-    // Simpler approach: render both in same provider
-  })
-
-  it("renders AuthStatus component", () => {
-    render(<Navbar />, { wrapper })
-    expect(screen.getByTestId("auth-status")).toBeInTheDocument()
+  it("renders AuthStatusServer", async () => {
+    const jsx = await Navbar()
+    render(jsx)
+    expect(screen.getByTestId("auth-status-server")).toBeInTheDocument()
   })
 })

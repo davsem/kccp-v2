@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, beforeEach } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { PitchSectionCell } from "@/components/pitch-section-cell"
@@ -26,6 +26,10 @@ const unavailableSection: PitchSection = {
 }
 
 describe("PitchSectionCell", () => {
+  beforeEach(() => {
+    document.cookie = "kccp-basket=; max-age=0; path=/"
+  })
+
   it("does not render label text inside cell (too small)", () => {
     render(<PitchSectionCell section={availableSection} isSold={false} />, { wrapper })
     expect(screen.queryByText("R1C1")).not.toBeInTheDocument()

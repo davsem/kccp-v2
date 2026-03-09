@@ -61,6 +61,8 @@ const TEST_PROFILE: Profile = {
   first_name: "Alice",
   last_name: "Smith",
   email: "alice@example.com",
+  created_at: "2024-01-01T00:00:00Z",
+  updated_at: "2024-01-01T00:00:00Z",
 }
 
 function renderCheckout() {
