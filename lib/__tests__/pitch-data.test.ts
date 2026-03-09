@@ -7,28 +7,17 @@ import {
 } from "@/lib/pitch-data"
 
 describe("pitchSections", () => {
-  it("has 200 sections", () => {
-    expect(pitchSections).toHaveLength(200)
+  it("has 1000 sections", () => {
+    expect(pitchSections).toHaveLength(1000)
   })
 
-  it("grid constants are 20×10", () => {
-    expect(GRID_COLS).toBe(20)
-    expect(GRID_ROWS).toBe(10)
+  it("grid constants are 40×25", () => {
+    expect(GRID_COLS).toBe(40)
+    expect(GRID_ROWS).toBe(25)
   })
 
-  it("centre sections (rows 3-6, cols 7-13) are priced at £100", () => {
-    const centre = pitchSections.filter(
-      (s) => s.row >= 3 && s.row <= 6 && s.col >= 7 && s.col <= 13
-    )
-    expect(centre.length).toBeGreaterThan(0)
-    centre.forEach((s) => expect(s.price).toBe(100))
-  })
-
-  it("edge sections are priced at £50", () => {
-    const edge = pitchSections.filter(
-      (s) => !(s.row >= 3 && s.row <= 6 && s.col >= 7 && s.col <= 13)
-    )
-    edge.forEach((s) => expect(s.price).toBe(50))
+  it("all sections are priced at £50", () => {
+    pitchSections.forEach((s) => expect(s.price).toBe(50))
   })
 
   it("all sections are available by default", () => {
@@ -39,7 +28,7 @@ describe("pitchSections", () => {
     const first = pitchSections[0]
     expect(first.label).toBe("R1C1")
     const last = pitchSections[pitchSections.length - 1]
-    expect(last.label).toBe("R10C20")
+    expect(last.label).toBe("R25C40")
   })
 })
 

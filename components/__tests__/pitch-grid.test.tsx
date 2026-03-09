@@ -16,10 +16,10 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 )
 
 describe("PitchGrid", () => {
-  it("renders 200 cells", () => {
+  it("renders 1000 cells", () => {
     render(<PitchGrid />, { wrapper })
     const buttons = screen.getAllByRole("button")
-    expect(buttons).toHaveLength(200)
+    expect(buttons).toHaveLength(1000)
   })
 
   it("shows 0 sections selected initially", () => {
@@ -32,10 +32,28 @@ describe("PitchGrid", () => {
     render(<PitchGrid />, { wrapper })
 
     // Click first cell (R1C1 = £50)
-    await user.click(screen.getByTitle("R1C1 — £50"))
+    await user.click(screen.getAllByRole("button")[0])
 
     expect(screen.getByText(/1 section selected/)).toBeInTheDocument()
     expect(screen.getByText("£50")).toBeInTheDocument()
+  })
+
+  it("calculates total as count × £50", async () => {
+    const user = userEvent.setup()
+    render(<PitchGrid />, { wrapper })
+
+    const buttons = screen.getAllByRole("button")
+    await user.click(buttons[0])
+    await user.click(buttons[1])
+
+    expect(screen.getByText(/2 sections selected/)).toBeInTheDocument()
+    expect(screen.getByText("£100")).toBeInTheDocument()
+  })
+
+  it("renders outer wrapper with pitch SVG background", () => {
+    const { container } = render(<PitchGrid />, { wrapper })
+    const bgEl = container.querySelector("[style*='pitch.svg']")
+    expect(bgEl).toBeInTheDocument()
   })
 
   it("View Basket button is disabled when basket is empty", () => {

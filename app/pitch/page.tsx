@@ -19,8 +19,7 @@ export default async function PitchPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">The Pitch</h1>
         <p className="mt-1 text-muted-foreground">
-          Click any green section to add it to your basket. Centre sections are
-          £100; all others are £50.
+          Click any green section to add it to your basket. Each section costs £50.
         </p>
       </div>
       <PitchGrid purchasedSections={purchasedSections} />
