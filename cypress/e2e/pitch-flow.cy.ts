@@ -8,21 +8,20 @@ describe("Pitch flow", () => {
   })
 
   it("clicking a cell selects it (amber) and updates count", () => {
-    // Click R1C1
-    cy.contains("button", "R1C1").click()
-    cy.contains("button", "R1C1").should("have.class", "bg-amber-400")
+    cy.get('[data-section-id="0-0"]').click()
+    cy.get('[data-section-id="0-0"]').should("have.class", "bg-amber-400/60")
     cy.contains("1 section selected").should("exist")
   })
 
   it("clicking a selected cell deselects it", () => {
-    cy.contains("button", "R1C1").click()
-    cy.contains("button", "R1C1").click()
-    cy.contains("button", "R1C1").should("have.class", "bg-green-500")
+    cy.get('[data-section-id="0-0"]').click()
+    cy.get('[data-section-id="0-0"]').click()
+    cy.get('[data-section-id="0-0"]').should("have.class", "bg-green-500/40")
     cy.contains("0 sections selected").should("exist")
   })
 
   it("total updates on selection", () => {
-    cy.contains("button", "R1C1").click() // £50
+    cy.get('[data-section-id="0-0"]').click() // £50
     cy.contains("£50").should("exist")
   })
 })

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useBasket } from "@/lib/basket-context";
 import { pitchSections, getSectionById, GRID_COLS, GRID_ROWS } from "@/lib/pitch-data";
@@ -20,15 +20,19 @@ interface TooltipState {
 }
 
 export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
-  const { count, isSelected } = useBasket();
+  const { count, isSelected, selectedIds } = useBasket();
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  const purchasedMap = new Map(
-    purchasedSections.map((ps) => [ps.section_id, ps])
+  const purchasedMap = useMemo(() => new Map(
+      purchasedSections.map((ps) => [ps.section_id, ps])
+    ), [purchasedSections]
   );
 
-  const total = count * 50;
+  const total = Array.from(selectedIds).reduce((sum, id) => {
+    const s = getSectionById(id);
+    return sum + (s?.price ?? 0);
+  }, 0);
 
   const handlePointerEnter = useCallback(
     (e: React.PointerEvent) => {
@@ -36,7 +40,8 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
         "[data-section-id]"
       );
       if (!target) return;
-      const id = target.dataset.sectionId!;
+      const id = target.dataset.sectionId || null;
+      if (!id) return;
       const section = getSectionById(id);
       if (!section) return;
 

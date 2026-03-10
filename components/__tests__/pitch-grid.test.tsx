@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { PitchGrid } from "@/components/pitch-grid"
@@ -16,6 +16,10 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 )
 
 describe("PitchGrid", () => {
+  beforeEach(() => {
+    document.cookie = "kccp-basket=; max-age=0; path=/"
+  })
+
   it("renders 1000 cells", () => {
     render(<PitchGrid />, { wrapper })
     const buttons = screen.getAllByRole("button")

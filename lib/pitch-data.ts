@@ -23,6 +23,7 @@ export const pitchSections: PitchSection[] = Array.from(
     })
 ).flat();
 
-export function getSectionById(id: string): PitchSection | undefined {
+export function getSectionById(id: string | null): PitchSection | undefined {
+  if (!id) return undefined;
   return sectionMap.get(id);
 }

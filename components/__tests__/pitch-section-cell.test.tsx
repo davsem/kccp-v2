@@ -30,9 +30,11 @@ describe("PitchSectionCell", () => {
     document.cookie = "kccp-basket=; max-age=0; path=/"
   })
 
-  it("does not render label text inside cell (too small)", () => {
+  it("renders label text only as screen-reader-only", () => {
     render(<PitchSectionCell section={availableSection} isSold={false} />, { wrapper })
-    expect(screen.queryByText("R1C1")).not.toBeInTheDocument()
+    const label = screen.getByText("R1C1")
+    expect(label).toBeInTheDocument()
+    expect(label).toHaveClass("sr-only")
   })
 
   it("shows green semi-transparent state when unselected and available", () => {

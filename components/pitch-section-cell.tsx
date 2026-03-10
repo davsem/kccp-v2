@@ -38,6 +38,8 @@ export function PitchSectionCell({ section, isSold }: PitchSectionCellProps) {
             : "border-green-600/40 bg-green-500/40 hover:bg-green-500/60"
           : "cursor-not-allowed border-muted/50 bg-muted/30"
       )}
-    />
+    >
+      <span className="sr-only">{section.label}</span>
+    </button>
   );
 }
