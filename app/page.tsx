@@ -9,7 +9,7 @@ export default function Home() {
           Khalsa Community Pitch Project
         </h1>
         <p className="text-xl text-muted-foreground">
-          Help Khalsa Hockey Club build a world-class artificial pitch.
+          Help Khalsa &amp; Leamington Hockey Club build a world-class artificial pitch.
         </p>
       </div>
 
