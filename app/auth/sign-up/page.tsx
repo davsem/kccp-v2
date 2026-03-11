@@ -63,7 +63,7 @@ function SignUpForm() {
 
   if (confirmed) {
     return (
-      <div className="mx-auto max-w-sm px-4 py-16 space-y-4">
+      <div className="mx-auto max-w-sm px-4 py-8 sm:py-16 space-y-4">
         <h1 className="text-2xl font-bold tracking-tight">Check your email</h1>
         <p className="text-sm text-muted-foreground">
           We sent a confirmation link to <strong>{email}</strong>. Click it to
@@ -74,7 +74,7 @@ function SignUpForm() {
   }
 
   return (
-    <div className="mx-auto max-w-sm px-4 py-16 space-y-6">
+    <div className="mx-auto max-w-sm px-4 py-8 sm:py-16 space-y-6">
       <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
         <p className="text-sm text-muted-foreground">

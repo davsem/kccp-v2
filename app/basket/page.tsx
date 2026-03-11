@@ -7,7 +7,7 @@ export const metadata = {
 export default function BasketPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Your Basket</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Your Basket</h1>
       <BasketContent />
     </div>
   );

@@ -80,15 +80,15 @@ export function BasketContent() {
         )}
       </div>
 
-      <div className="flex items-center justify-between border-t pt-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t pt-4">
         <p className="font-semibold">
           Total: £{total}
         </p>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={clear}>
+          <Button variant="outline" onClick={clear} className="flex-1 sm:flex-initial">
             Clear Basket
           </Button>
-          <Button asChild disabled={staleIds.length > 0}>
+          <Button asChild disabled={staleIds.length > 0} className="flex-1 sm:flex-initial">
             <Link href="/checkout">Proceed to Checkout</Link>
           </Button>
         </div>

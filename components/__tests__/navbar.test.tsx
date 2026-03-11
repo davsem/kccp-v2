@@ -37,6 +37,10 @@ vi.mock("@/components/auth-state-listener", () => ({
   AuthStateListener: () => null,
 }))
 
+vi.mock("@/components/mobile-nav", () => ({
+  MobileNav: () => <div data-testid="mobile-nav" />,
+}))
+
 describe("Navbar", () => {
   it("renders brand link", async () => {
     const jsx = await Navbar()

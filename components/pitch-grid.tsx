@@ -69,7 +69,6 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
         y: rect.top,
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [purchasedMap, isSelected]
   );
 
@@ -84,9 +83,16 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto">
+      <div
+        className="overflow-x-auto border rounded-lg"
+        style={{
+          maxHeight: "70vh",
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-x pan-y pinch-zoom",
+        }}
+      >
         <div
-          className="min-w-[768px] w-full"
+          className="min-w-[600px] w-full"
           style={{
             aspectRatio: "544.25 / 327.35",
             backgroundImage: "url('/pitch.svg')",
@@ -120,7 +126,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
 
       {tooltip && (
         <div
-          className="pointer-events-none fixed z-50 rounded-md border bg-popover px-3 py-1.5 text-xs text-popover-foreground shadow-md"
+          className="pointer-events-none fixed z-50 hidden sm:block rounded-md border bg-popover px-3 py-1.5 text-xs text-popover-foreground shadow-md"
           style={{
             left: tooltip.x,
             top: tooltip.y,
@@ -136,7 +142,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
           {count} section{count !== 1 ? "s" : ""} selected &mdash; Total: <strong>£{total}</strong>
         </p>
