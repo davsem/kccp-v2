@@ -23,12 +23,13 @@ describe("SectionOwnerNames", () => {
     expect(screen.getByText("R1C2")).toBeInTheDocument()
   })
 
-  it("shows default name in the bulk-name label", () => {
+  it("shows owner name on each section card by default", () => {
     renderComponent()
-    expect(screen.getByText(DEFAULT_NAME, { exact: false })).toBeInTheDocument()
+    const nameElements = screen.getAllByText(DEFAULT_NAME)
+    expect(nameElements.length).toBe(SECTION_IDS.length)
   })
 
-  it("calls onContinue with default name for all sections when bulk toggle is on", async () => {
+  it("calls onContinue with default name for all sections", async () => {
     const user = userEvent.setup()
     const onContinue = vi.fn()
     renderComponent(onContinue)
@@ -41,12 +42,12 @@ describe("SectionOwnerNames", () => {
     ])
   })
 
-  it("shows per-section input when 'Name differently' is clicked", async () => {
+  it("shows per-section input when 'Change sponsor name' is clicked", async () => {
     const user = userEvent.setup()
     renderComponent()
 
-    const nameDifferentlyBtns = screen.getAllByRole("button", { name: /Name differently/i })
-    await user.click(nameDifferentlyBtns[0])
+    const changeBtns = screen.getAllByRole("button", { name: /Change sponsor name/i })
+    await user.click(changeBtns[0])
 
     expect(screen.getByPlaceholderText("Owner name")).toBeInTheDocument()
   })
@@ -56,9 +57,8 @@ describe("SectionOwnerNames", () => {
     const onContinue = vi.fn()
     renderComponent(onContinue)
 
-    // Override the name for the first section
-    const nameDifferentlyBtns = screen.getAllByRole("button", { name: /Name differently/i })
-    await user.click(nameDifferentlyBtns[0])
+    const changeBtns = screen.getAllByRole("button", { name: /Change sponsor name/i })
+    await user.click(changeBtns[0])
 
     const input = screen.getByPlaceholderText("Owner name")
     await user.clear(input)
@@ -74,12 +74,31 @@ describe("SectionOwnerNames", () => {
     expect(secondConfig?.owner_name).toBe(DEFAULT_NAME)
   })
 
-  it("toggling show_owner_name checkbox changes value in onContinue", async () => {
+  it("renders 'Keep anonymous' checkboxes, unchecked by default", () => {
+    renderComponent()
+    const checkboxes = screen.getAllByRole("checkbox")
+    expect(checkboxes).toHaveLength(SECTION_IDS.length)
+    checkboxes.forEach((cb) => expect(cb).not.toBeChecked())
+  })
+
+  it("'Keep anonymous' unchecked by default results in show_owner_name = true", async () => {
     const user = userEvent.setup()
     const onContinue = vi.fn()
     renderComponent(onContinue)
 
-    // Uncheck the "Show name publicly" for the first section
+    await user.click(screen.getByRole("button", { name: /Continue to Billing/i }))
+
+    const configs = onContinue.mock.calls[0][0]
+    configs.forEach((c: { show_owner_name: boolean }) => {
+      expect(c.show_owner_name).toBe(true)
+    })
+  })
+
+  it("checking 'Keep anonymous' results in show_owner_name = false", async () => {
+    const user = userEvent.setup()
+    const onContinue = vi.fn()
+    renderComponent(onContinue)
+
     const checkboxes = screen.getAllByRole("checkbox")
     await user.click(checkboxes[0])
 
@@ -88,23 +107,8 @@ describe("SectionOwnerNames", () => {
     const configs = onContinue.mock.calls[0][0]
     const firstConfig = configs.find((c: { section_id: string }) => c.section_id === "0-0")
     expect(firstConfig?.show_owner_name).toBe(false)
-  })
-
-  it("resetting bulk toggle restores default name for all sections", async () => {
-    const user = userEvent.setup()
-    const onContinue = vi.fn()
-    renderComponent(onContinue)
-
-    // Turn off bulk toggle, then turn it back on
-    const toggle = screen.getByRole("switch")
-    await user.click(toggle) // off
-    await user.click(toggle) // back on
-
-    await user.click(screen.getByRole("button", { name: /Continue to Billing/i }))
-
-    const configs = onContinue.mock.calls[0][0]
-    configs.forEach((c: { owner_name: string }) => {
-      expect(c.owner_name).toBe(DEFAULT_NAME)
-    })
+    // Second section unaffected
+    const secondConfig = configs.find((c: { section_id: string }) => c.section_id === "0-1")
+    expect(secondConfig?.show_owner_name).toBe(true)
   })
 })
