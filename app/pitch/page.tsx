@@ -51,7 +51,7 @@ function PitchGridSkeleton() {
 
 export default function PitchPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 space-y-6">
+    <div className="mx-auto max-w-6xl px-4 py-8 lg:py-12 space-y-6">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">The Pitch</h1>
         <p className="mt-1 text-muted-foreground">

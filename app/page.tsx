@@ -24,7 +24,7 @@ export default function Home() {
       />
 
       {/* Hero content */}
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:gap-16 md:py-28">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:gap-16 md:py-28 lg:py-36 xl:py-44">
 
         {/* Left: copy */}
         <div className="space-y-8">
@@ -42,7 +42,7 @@ export default function Home() {
           </div>
 
           {/* Headline */}
-          <h1 className="font-display text-5xl font-bold leading-[1.06] tracking-tight animate-slide-up sm:text-6xl lg:text-7xl">
+          <h1 className="font-display text-5xl font-bold leading-[1.06] tracking-tight animate-slide-up sm:text-6xl lg:text-7xl xl:text-7xl">
             Help us build<br />
             <em className="not-italic text-brand-gold">our pitch.</em>
           </h1>
@@ -100,7 +100,7 @@ export default function Home() {
             { value: "£50–100", label: "per section" },
             { value: "Forever", label: "on the pitch" },
           ].map(({ value, label }) => (
-            <div key={label} className="py-6 text-center">
+            <div key={label} className="py-6 text-center lg:py-8">
               <dt className="text-xl font-bold text-brand-gold sm:text-2xl">
                 {value}
               </dt>

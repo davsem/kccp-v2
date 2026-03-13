@@ -22,7 +22,7 @@ export default async function CheckoutPage() {
   if (!profile) redirect("/auth/complete-profile");
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
+    <div className="mx-auto max-w-2xl px-4 py-8 lg:max-w-3xl lg:py-12">
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8">Checkout</h1>
       <CheckoutContent profile={profile as Profile} />
     </div>
