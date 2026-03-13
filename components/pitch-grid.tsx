@@ -19,9 +19,14 @@ interface TooltipState {
   y: number;
 }
 
+// Half the estimated maximum tooltip width in px — used to clamp tooltip within viewport
+const TOOLTIP_HALF_WIDTH = 110;
+
 export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
   const { count, isSelected, selectedIds } = useBasket();
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [mobileStatus, setMobileStatus] = useState<string | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState(0);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const purchasedMap = useMemo(() => new Map(
@@ -29,10 +34,14 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
     ), [purchasedSections]
   );
 
-  const total = Array.from(selectedIds).reduce((sum, id) => {
-    const s = getSectionById(id);
-    return sum + (s?.price ?? 0);
-  }, 0);
+  const priceTotal = useMemo(
+    () =>
+      Array.from(selectedIds).reduce((sum, id) => {
+        const s = getSectionById(id);
+        return sum + (s?.price ?? 0);
+      }, 0),
+    [selectedIds]
+  );
 
   const handlePointerEnter = useCallback(
     (e: React.PointerEvent) => {
@@ -47,6 +56,11 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
 
       const purchased = purchasedMap.get(id);
       const rect = target.getBoundingClientRect();
+      // Clamp x so tooltip never clips at viewport edges (M3)
+      const clampedX = Math.max(
+        TOOLTIP_HALF_WIDTH,
+        Math.min(rect.left + rect.width / 2, window.innerWidth - TOOLTIP_HALF_WIDTH)
+      );
 
       let content: string;
       let detail: string | undefined;
@@ -62,12 +76,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
         content = `${section.label} — £${section.price} — ${state}`;
       }
 
-      setTooltip({
-        content,
-        detail,
-        x: rect.left + rect.width / 2,
-        y: rect.top,
-      });
+      setTooltip({ content, detail, x: clampedX, y: rect.top });
     },
     [purchasedMap, isSelected]
   );
@@ -79,6 +88,50 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
       setTooltip(null);
     },
     []
+  );
+
+  // Mobile-only: show section info in a status bar on tap (C3)
+  const handleGridClick = useCallback(
+    (e: React.MouseEvent) => {
+      const target = (e.target as HTMLElement).closest<HTMLElement>("[data-section-id]");
+      if (!target) return;
+      const id = target.dataset.sectionId || null;
+      if (!id) return;
+      const section = getSectionById(id);
+      if (!section) return;
+
+      if (purchasedMap.has(id)) {
+        setMobileStatus(`${section.label} — Sold`);
+        return;
+      }
+      // By the time this handler fires, the cell's onClick has already toggled the basket
+      const nowSelected = isSelected(id);
+      setMobileStatus(
+        `${section.label} — £${section.price} — ${nowSelected ? "Added to basket" : "Removed"}`
+      );
+    },
+    [purchasedMap, isSelected]
+  );
+
+  // Arrow-key roving tabindex for keyboard navigation (H7)
+  const handleGridKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) return;
+      e.preventDefault();
+
+      let next = focusedIndex;
+      if (e.key === "ArrowRight") next = Math.min(focusedIndex + 1, pitchSections.length - 1);
+      if (e.key === "ArrowLeft") next = Math.max(focusedIndex - 1, 0);
+      if (e.key === "ArrowDown") next = Math.min(focusedIndex + GRID_COLS, pitchSections.length - 1);
+      if (e.key === "ArrowUp") next = Math.max(focusedIndex - GRID_COLS, 0);
+
+      if (next !== focusedIndex) {
+        setFocusedIndex(next);
+        const cells = gridRef.current?.querySelectorAll<HTMLElement>("[data-section-id]");
+        cells?.[next]?.focus();
+      }
+    },
+    [focusedIndex]
   );
 
   return (
@@ -105,6 +158,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
           <div
             ref={gridRef}
             className="grid gap-0.5 h-full"
+            aria-label="Pitch sections — use arrow keys to navigate, Space or Enter to select"
             style={{
               gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`,
               gridTemplateRows: `repeat(${GRID_ROWS}, 1fr)`,
@@ -112,17 +166,32 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
             onPointerEnter={handlePointerEnter}
             onPointerOver={handlePointerEnter}
             onPointerLeave={handlePointerLeave}
+            onClick={handleGridClick}
+            onKeyDown={handleGridKeyDown}
           >
-            {pitchSections.map((section) => (
+            {pitchSections.map((section, index) => (
               <PitchSectionCell
                 key={section.id}
                 section={section}
                 isSold={purchasedMap.has(section.id)}
+                tabIndex={index === focusedIndex ? 0 : -1}
+                onFocus={() => setFocusedIndex(index)}
               />
             ))}
           </div>
         </div>
       </div>
+
+      {/* Mobile-only status bar — shows last-tapped section info (C3) */}
+      {mobileStatus && (
+        <p
+          aria-live="polite"
+          aria-atomic="true"
+          className="text-sm text-center text-muted-foreground sm:hidden"
+        >
+          {mobileStatus}
+        </p>
+      )}
 
       {tooltip && (
         <div
@@ -144,11 +213,16 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          {count} section{count !== 1 ? "s" : ""} selected &mdash; Total: <strong>£{total}</strong>
+          {count} section{count !== 1 ? "s" : ""} selected &mdash; Total: <strong>£{priceTotal}</strong>
         </p>
-        <Button asChild disabled={count === 0}>
-          <Link href="/basket">View Basket</Link>
-        </Button>
+        {/* M9: don't use asChild+Link when disabled — <a> ignores the disabled attribute */}
+        {count === 0 ? (
+          <Button disabled>View Basket</Button>
+        ) : (
+          <Button asChild>
+            <Link href="/basket">View Basket</Link>
+          </Button>
+        )}
       </div>
     </div>
   );

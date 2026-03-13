@@ -17,12 +17,12 @@ export async function Navbar() {
   const pathname = headersList.get("x-pathname") ?? "/"
 
   return (
-    <header className="border-b bg-background">
+    <header role="banner" className="border-b bg-background">
       <div className="mx-auto flex max-w-6xl items-center justify-end px-4 py-3 gap-4 md:gap-6">
         <Link href="/" className="text-sm sm:text-base font-semibold tracking-tight text-foreground mr-auto">
           Khalsa Community Pitch Project
         </Link>
-        <nav className="hidden md:flex items-center gap-6">
+        <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
           <NavLinks />
           <BasketBadge />
         </nav>

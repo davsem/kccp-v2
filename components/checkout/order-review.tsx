@@ -5,6 +5,7 @@ import { stripePromise } from "@/lib/stripe/client";
 import { PaymentForm } from "@/components/checkout/payment-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { getSectionById } from "@/lib/pitch-data";
+import { Check } from "lucide-react";
 import type { BillingAddress, SectionOwnerConfig } from "@/lib/types";
 
 interface OrderReviewProps {
@@ -65,7 +66,12 @@ export function OrderReview({
         {billing.address_line2 && <p className="text-sm">{billing.address_line2}</p>}
         <p className="text-sm">{billing.city}, {billing.postal_code}</p>
         <p className="text-sm">{billing.country}</p>
-        {giftAid && <p className="text-sm font-medium text-green-700 dark:text-green-400 mt-2">GiftAid declared ✓</p>}
+        {giftAid && (
+          <p className="text-sm font-medium text-green-700 dark:text-green-400 mt-2 flex items-center gap-1.5">
+            <Check aria-hidden="true" className="size-3.5 shrink-0" />
+            <span>GiftAid declared</span>
+          </p>
+        )}
       </div>
 
       <div className="flex justify-between font-semibold text-lg border-t pt-4">
