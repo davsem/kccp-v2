@@ -229,6 +229,27 @@
   }
 }
 
+@keyframes draw-circle {
+  from { stroke-dashoffset: 327; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes draw-check {
+  from { stroke-dashoffset: 63; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes pop-in {
+  0%   { opacity: 0; transform: scale(0.6); }
+  70%  { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
