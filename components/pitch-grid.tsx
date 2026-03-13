@@ -137,7 +137,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
   return (
     <div className="space-y-4">
       <div
-        className="overflow-x-auto border rounded-lg"
+        className="overflow-x-auto"
         style={{
           maxHeight: "70vh",
           WebkitOverflowScrolling: "touch",

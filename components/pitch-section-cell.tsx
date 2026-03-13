@@ -24,7 +24,10 @@ export function PitchSectionCell({ section, isSold, tabIndex, onFocus }: PitchSe
         data-section-id={section.id}
         tabIndex={tabIndex}
         onFocus={onFocus}
-        className="w-full h-full cursor-not-allowed rounded-sm border border-slate-400/50 bg-slate-300/50 transition-colors"
+        className="w-full h-full cursor-not-allowed rounded-sm border border-pitch-sold-border transition-colors"
+        style={{
+          background: `repeating-linear-gradient(-45deg, var(--pitch-sold) 0px, var(--pitch-sold) 1.5px, transparent 1.5px, transparent 5px)`,
+        }}
       />
     );
   }
@@ -45,8 +48,8 @@ export function PitchSectionCell({ section, isSold, tabIndex, onFocus }: PitchSe
         "w-full h-full rounded-sm border transition-colors",
         section.available
           ? selected
-            ? "border-amber-500/60 bg-amber-400/60 hover:bg-amber-400/80"
-            : "border-green-600/40 bg-green-500/40 hover:bg-green-500/60"
+            ? "border-pitch-selected-border bg-pitch-selected/70 hover:bg-pitch-selected-hover/85"
+            : "border-pitch-available-border bg-pitch-available/35 hover:bg-pitch-available-hover/55"
           : "cursor-not-allowed border-muted/50 bg-muted/30"
       )}
     />
