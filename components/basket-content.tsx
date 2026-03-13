@@ -50,18 +50,21 @@ export function BasketContent() {
     <div className="space-y-4">
       {staleIds.length > 0 && (
         <Alert variant="destructive">
-          <AlertDescription>
-            {staleIds.length === 1
-              ? "1 section in your basket has just been purchased by someone else."
-              : `${staleIds.length} sections in your basket have just been purchased by someone else.`}{" "}
+          <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
+            <span>
+              {staleIds.length === 1
+                ? "1 section in your basket has just been sold to someone else."
+                : `${staleIds.length} sections in your basket have just been sold to someone else.`}{" "}
+              They are marked below.
+            </span>
             <button
-              className="underline font-medium"
+              className="underline font-medium whitespace-nowrap"
               onClick={() => {
                 removeMultiple(staleIds);
                 setStaleIds([]);
               }}
             >
-              Remove them
+              Remove unavailable sections
             </button>
           </AlertDescription>
         </Alert>
@@ -70,9 +73,16 @@ export function BasketContent() {
       <div className="space-y-2">
         {items.map((section) =>
           section ? (
-            <Card key={section.id} className={staleIds.includes(section.id) ? "opacity-50" : ""}>
+            <Card key={section.id} className={staleIds.includes(section.id) ? "opacity-60" : ""}>
               <CardContent className="flex items-center justify-between py-3 px-4">
-                <span className="font-medium">{section.label}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{section.label}</span>
+                  {staleIds.includes(section.id) && (
+                    <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-xs font-medium text-destructive">
+                      Sold
+                    </span>
+                  )}
+                </div>
                 <span className="text-muted-foreground">£{section.price}</span>
               </CardContent>
             </Card>

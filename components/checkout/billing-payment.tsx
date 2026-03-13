@@ -192,9 +192,19 @@ export function BillingPayment({ defaultName, onReview, onBack }: BillingPayment
         </div>
       </div>
 
-      <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
-        <h3 className="font-semibold">GiftAid Declaration</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">
+      <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-4 space-y-3">
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="font-semibold">GiftAid Declaration</h3>
+          <a
+            href="https://www.gov.uk/donating-to-charity/gift-aid"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 text-xs text-primary underline underline-offset-2 hover:text-primary/80"
+          >
+            What is GiftAid?
+          </a>
+        </div>
+        <p className="text-sm leading-relaxed">
           I am a UK taxpayer and understand that if I pay less Income Tax and/or Capital Gains Tax than
           the amount of Gift Aid claimed on all my donations in that tax year, it is my responsibility
           to pay any difference. I want Khalsa Hockey Club to reclaim Gift Aid on this donation and any
