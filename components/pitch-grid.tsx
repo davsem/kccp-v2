@@ -164,7 +164,6 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
               gridTemplateRows: `repeat(${GRID_ROWS}, 1fr)`,
             }}
             onPointerEnter={handlePointerEnter}
-            onPointerOver={handlePointerEnter}
             onPointerLeave={handlePointerLeave}
             onClick={handleGridClick}
             onKeyDown={handleGridKeyDown}
