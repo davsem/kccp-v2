@@ -21,9 +21,9 @@ describe("PitchGrid", () => {
   })
 
   it("renders 1000 cells", () => {
-    render(<PitchGrid />, { wrapper })
-    const buttons = screen.getAllByRole("button")
-    expect(buttons).toHaveLength(1000)
+    const { container } = render(<PitchGrid />, { wrapper })
+    const cells = container.querySelectorAll("[data-section-id]")
+    expect(cells).toHaveLength(1000)
   })
 
   it("shows 0 sections selected initially", () => {
@@ -62,6 +62,7 @@ describe("PitchGrid", () => {
 
   it("View Basket button is disabled when basket is empty", () => {
     render(<PitchGrid />, { wrapper })
-    expect(screen.getByRole("link", { name: /View Basket/i }).closest("button, a")).toBeInTheDocument()
+    const btn = screen.getByRole("button", { name: /View Basket/i })
+    expect(btn).toBeDisabled()
   })
 })

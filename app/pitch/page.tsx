@@ -7,7 +7,7 @@ export const metadata = {
   title: "The Pitch — Khalsa Community Pitch Project",
 };
 
-async function PitchGridLoader() {
+export async function PitchGridLoader() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("purchased_sections")

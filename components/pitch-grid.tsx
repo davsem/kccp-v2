@@ -28,6 +28,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
   const [mobileStatus, setMobileStatus] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(0);
   const gridRef = useRef<HTMLDivElement>(null);
+  const lastHoveredId = useRef<string | null>(null);
 
   const purchasedMap = useMemo(() => new Map(
       purchasedSections.map((ps) => [ps.section_id, ps])
@@ -43,7 +44,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
     [selectedIds]
   );
 
-  const handlePointerEnter = useCallback(
+  const handlePointerOver = useCallback(
     (e: React.PointerEvent) => {
       const target = (e.target as HTMLElement).closest<HTMLElement>(
         "[data-section-id]"
@@ -51,6 +52,8 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
       if (!target) return;
       const id = target.dataset.sectionId || null;
       if (!id) return;
+      if (id === lastHoveredId.current) return;
+      lastHoveredId.current = id;
       const section = getSectionById(id);
       if (!section) return;
 
@@ -85,6 +88,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
     (e: React.PointerEvent) => {
       const related = e.relatedTarget as HTMLElement | null;
       if (related?.closest?.("[data-section-id]")) return;
+      lastHoveredId.current = null;
       setTooltip(null);
     },
     []
@@ -163,7 +167,7 @@ export function PitchGrid({ purchasedSections = [] }: PitchGridProps) {
               gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`,
               gridTemplateRows: `repeat(${GRID_ROWS}, 1fr)`,
             }}
-            onPointerEnter={handlePointerEnter}
+            onPointerOver={handlePointerOver}
             onPointerLeave={handlePointerLeave}
             onClick={handleGridClick}
             onKeyDown={handleGridKeyDown}

@@ -28,7 +28,7 @@ vi.mock("@/lib/supabase/server", () => ({
 }))
 
 // Dynamic import to pick up mocks
-const { default: PitchPage } = await import("@/app/pitch/page")
+const { default: PitchPage, PitchGridLoader } = await import("@/app/pitch/page")
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <BasketProvider>{children}</BasketProvider>
@@ -40,6 +40,11 @@ describe("PitchPage", () => {
     document.cookie = "kccp-basket=; max-age=0; path=/"
   })
 
+  it("renders the page heading", () => {
+    render(PitchPage(), { wrapper })
+    expect(screen.getByRole("heading", { name: /the pitch/i })).toBeInTheDocument()
+  })
+
   it("renders the pitch grid when fetch succeeds", async () => {
     mockCreateClient.mockResolvedValue(
       makeMockSupabase({
@@ -48,9 +53,8 @@ describe("PitchPage", () => {
       })
     )
 
-    render(await PitchPage(), { wrapper })
+    render(await PitchGridLoader(), { wrapper })
 
-    expect(screen.getByRole("heading", { name: /the pitch/i })).toBeInTheDocument()
     expect(screen.getByText(/sections selected/i)).toBeInTheDocument()
   })
 
@@ -59,7 +63,7 @@ describe("PitchPage", () => {
       makeMockSupabase({ data: null, error: { message: "connection failed" } })
     )
 
-    render(await PitchPage(), { wrapper })
+    render(await PitchGridLoader(), { wrapper })
 
     expect(screen.getByText(/unable to load pitch data/i)).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /try again/i })).toHaveAttribute("href", "/pitch")
@@ -71,7 +75,7 @@ describe("PitchPage", () => {
       makeMockSupabase({ data: null, error: { message: "connection failed" } })
     )
 
-    const { container } = render(await PitchPage(), { wrapper })
+    const { container } = render(await PitchGridLoader(), { wrapper })
 
     expect(container.querySelectorAll("button")).toHaveLength(0)
   })

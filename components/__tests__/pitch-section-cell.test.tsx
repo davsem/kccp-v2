@@ -30,34 +30,33 @@ describe("PitchSectionCell", () => {
     document.cookie = "kccp-basket=; max-age=0; path=/"
   })
 
-  it("renders label text only as screen-reader-only", () => {
-    render(<PitchSectionCell section={availableSection} isSold={false} />, { wrapper })
-    const label = screen.getByText("R1C1")
-    expect(label).toBeInTheDocument()
-    expect(label).toHaveClass("sr-only")
-  })
-
-  it("shows green semi-transparent state when unselected and available", () => {
+  it("renders section label in aria-label", () => {
     render(<PitchSectionCell section={availableSection} isSold={false} />, { wrapper })
     const btn = screen.getByRole("button")
-    expect(btn).toHaveClass("bg-green-500/40")
+    expect(btn).toHaveAttribute("aria-label", expect.stringContaining("R1C1"))
   })
 
-  it("toggles to amber semi-transparent when clicked", async () => {
+  it("shows available styling when unselected and available", () => {
+    render(<PitchSectionCell section={availableSection} isSold={false} />, { wrapper })
+    const btn = screen.getByRole("button")
+    expect(btn).toHaveClass("bg-pitch-available/35")
+  })
+
+  it("toggles to selected styling when clicked", async () => {
     const user = userEvent.setup()
     render(<PitchSectionCell section={availableSection} isSold={false} />, { wrapper })
     const btn = screen.getByRole("button")
     await user.click(btn)
-    expect(btn).toHaveClass("bg-amber-400/60")
+    expect(btn).toHaveClass("bg-pitch-selected/70")
   })
 
-  it("toggles back to green on second click", async () => {
+  it("toggles back to available styling on second click", async () => {
     const user = userEvent.setup()
     render(<PitchSectionCell section={availableSection} isSold={false} />, { wrapper })
     const btn = screen.getByRole("button")
     await user.click(btn)
     await user.click(btn)
-    expect(btn).toHaveClass("bg-green-500/40")
+    expect(btn).toHaveClass("bg-pitch-available/35")
   })
 
   it("is disabled when section is unavailable", () => {
@@ -73,13 +72,13 @@ describe("PitchSectionCell", () => {
   })
 
   describe("sold cells", () => {
-    it("shows slate semi-transparent styling for sold sections", () => {
+    it("shows cursor-not-allowed and aria-disabled for sold sections", () => {
       render(
         <PitchSectionCell section={availableSection} isSold={true} />,
         { wrapper }
       )
       const btn = screen.getByRole("button")
-      expect(btn).toHaveClass("bg-slate-300/50")
+      expect(btn).toHaveClass("cursor-not-allowed")
       expect(btn).toHaveAttribute("aria-disabled", "true")
     })
 
