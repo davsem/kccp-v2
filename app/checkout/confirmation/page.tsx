@@ -223,7 +223,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
           </p>
           <p>{order.billing_country}</p>
           {order.gift_aid && (
-            <p className="font-medium text-green-700 dark:text-green-400 mt-2 flex items-center gap-1.5">
+            <p className="font-medium text-green-700 mt-2 flex items-center gap-1.5">
               <svg
                 width="14"
                 height="14"

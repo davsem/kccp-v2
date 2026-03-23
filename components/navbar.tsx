@@ -22,7 +22,7 @@ export async function Navbar() {
         <Link href="/" className="text-sm sm:text-base font-semibold tracking-tight text-foreground mr-auto">
           Khalsa Community Pitch Project
         </Link>
-        <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
+        <nav aria-label="Main navigation" className="hidden md:flex items-center gap-2">
           <NavLinks />
           <BasketBadge />
         </nav>

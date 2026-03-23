@@ -11,6 +11,10 @@ vi.mock("next/link", () => ({
   ),
 }))
 
+vi.mock("@/components/ui/navigation-menu", () => ({
+  navigationMenuTriggerStyle: () => "nav-trigger-style",
+}))
+
 vi.mock("@/components/auth-status-dropdown", () => ({
   AuthStatusDropdown: ({ email }: { email: string }) => (
     <div data-testid="auth-status-dropdown">{email}</div>

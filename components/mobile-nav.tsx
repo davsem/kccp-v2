@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { BasketBadge } from "@/components/basket-badge"
 import { cn } from "@/lib/utils"
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 
 const links = [
   { href: "/", label: "Home" },
@@ -40,8 +41,9 @@ export function MobileNav({ userEmail, pathname }: MobileNavProps) {
                 href={href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "text-base transition-colors hover:text-foreground",
-                  currentPath === href ? "font-medium text-foreground" : "text-muted-foreground"
+                  navigationMenuTriggerStyle(),
+                  "w-full justify-start",
+                  currentPath === href && "bg-accent text-accent-foreground font-medium"
                 )}
               >
                 {label}
@@ -50,12 +52,29 @@ export function MobileNav({ userEmail, pathname }: MobileNavProps) {
             <div className="border-t pt-4">
               {userEmail ? (
                 <>
-                  <p className="text-sm text-muted-foreground mb-3 truncate">{userEmail}</p>
+                  <p className={cn(
+                    navigationMenuTriggerStyle(),
+                    "w-full justify-start text-muted-foreground pointer-events-none"
+                  )}>{userEmail}</p>
+                  <Link
+                    href="/profile"
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      "w-full justify-start",
+                      currentPath === "/profile" && "bg-accent text-accent-foreground font-medium"
+                    )}
+                  >
+                    Profile
+                  </Link>
                   <form action="/auth/sign-out" method="POST">
                     <button
                       type="submit"
                       onClick={() => setOpen(false)}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className={cn(
+                        navigationMenuTriggerStyle(),
+                        "w-full justify-start"
+                      )}
                     >
                       Sign out
                     </button>
@@ -65,7 +84,10 @@ export function MobileNav({ userEmail, pathname }: MobileNavProps) {
                 <Link
                   href={`/auth/sign-in?redirectTo=${encodeURIComponent(pathname)}`}
                   onClick={() => setOpen(false)}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    "w-full justify-start"
+                  )}
                 >
                   Sign in
                 </Link>

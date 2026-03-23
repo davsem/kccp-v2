@@ -67,7 +67,7 @@ export function OrderReview({
         <p className="text-sm">{billing.city}, {billing.postal_code}</p>
         <p className="text-sm">{billing.country}</p>
         {giftAid && (
-          <p className="text-sm font-medium text-green-700 dark:text-green-400 mt-2 flex items-center gap-1.5">
+          <p className="text-sm font-medium text-green-700 mt-2 flex items-center gap-1.5">
             <Check aria-hidden="true" className="size-3.5 shrink-0" />
             <span>GiftAid declared</span>
           </p>

@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu"
 
 interface AuthStatusDropdownProps {
   email: string
@@ -15,23 +16,24 @@ interface AuthStatusDropdownProps {
 
 export function AuthStatusDropdown({ email }: AuthStatusDropdownProps) {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="text-sm text-muted-foreground transition-colors hover:text-foreground outline-none">
-        {email}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <Link href="/profile">Profile</Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <form action="/auth/sign-out" method="POST">
-            <button type="submit" className="w-full text-left">
-              Sign out
-            </button>
-          </form>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <NavigationMenu viewport={false}>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>{email}</NavigationMenuTrigger>
+          <NavigationMenuContent className="right-0 left-auto">
+            <NavigationMenuLink asChild>
+              <Link href="/profile">Profile</Link>
+            </NavigationMenuLink>
+            <NavigationMenuLink asChild>
+              <form action="/auth/sign-out" method="POST">
+                <button type="submit" className="w-full text-left">
+                  Sign out
+                </button>
+              </form>
+            </NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
   )
 }

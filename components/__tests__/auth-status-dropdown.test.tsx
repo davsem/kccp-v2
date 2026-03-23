@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
 import { AuthStatusDropdown } from "@/components/auth-status-dropdown"
 import type { ReactNode } from "react"
 
@@ -10,23 +9,34 @@ vi.mock("next/link", () => ({
   ),
 }))
 
+vi.mock("@/components/ui/navigation-menu", () => ({
+  NavigationMenu: ({ children }: { children: ReactNode }) => <nav>{children}</nav>,
+  NavigationMenuList: ({ children }: { children: ReactNode }) => <ul>{children}</ul>,
+  NavigationMenuItem: ({ children }: { children: ReactNode }) => <li>{children}</li>,
+  NavigationMenuTrigger: ({ children, ...props }: { children: ReactNode; [key: string]: unknown }) => (
+    <button {...props}>{children}</button>
+  ),
+  NavigationMenuContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  NavigationMenuLink: ({ children, asChild }: { children: ReactNode; asChild?: boolean; [key: string]: unknown }) => {
+    if (asChild) return <>{children}</>
+    return <a>{children}</a>
+  },
+  navigationMenuTriggerStyle: () => "nav-trigger-style",
+}))
+
 describe("AuthStatusDropdown", () => {
   it("renders user email as trigger", () => {
     render(<AuthStatusDropdown email="user@example.com" />)
     expect(screen.getByText("user@example.com")).toBeInTheDocument()
   })
 
-  it("renders Profile link after opening dropdown", async () => {
-    const user = userEvent.setup()
+  it("renders Profile link", () => {
     render(<AuthStatusDropdown email="user@example.com" />)
-    await user.click(screen.getByText("user@example.com"))
-    expect(screen.getByRole("menuitem", { name: "Profile" })).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "Profile" })).toBeInTheDocument()
   })
 
-  it("renders Sign out button after opening dropdown", async () => {
-    const user = userEvent.setup()
+  it("renders Sign out button", () => {
     render(<AuthStatusDropdown email="user@example.com" />)
-    await user.click(screen.getByText("user@example.com"))
     expect(screen.getByRole("button", { name: /Sign out/i })).toBeInTheDocument()
   })
 })

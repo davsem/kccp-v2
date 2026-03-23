@@ -1,6 +1,7 @@
 import Link from "next/link"
 import type { User } from "@supabase/supabase-js"
 import { AuthStatusDropdown } from "@/components/auth-status-dropdown"
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 
 interface AuthStatusServerProps {
   user: User | null
@@ -12,7 +13,7 @@ export function AuthStatusServer({ user, pathname }: AuthStatusServerProps) {
     return (
       <Link
         href={`/auth/sign-in?redirectTo=${encodeURIComponent(pathname)}`}
-        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+        className={navigationMenuTriggerStyle()}
       >
         Sign in
       </Link>

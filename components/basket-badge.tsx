@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { useBasket } from "@/lib/basket-context"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 
 export function BasketBadge() {
   const pathname = usePathname()
@@ -13,8 +14,8 @@ export function BasketBadge() {
     <Link
       href="/basket"
       className={cn(
-        "text-sm transition-colors hover:text-foreground",
-        pathname === "/basket" ? "font-medium text-foreground" : "text-muted-foreground"
+        navigationMenuTriggerStyle(),
+        pathname === "/basket" && "bg-accent text-accent-foreground font-medium"
       )}
     >
       Basket
